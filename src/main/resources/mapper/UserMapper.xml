@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="test">
+    <!--根据id查询用户信息-->
+    <!--id为唯一标识
+    #{}表示一个占位符，如果#{}传入的是简单类型的参数，那么他里面的名称随意，
+    paramterType:输入参数的类型，通过占位符#{}接受paramterType传入的参数值
+    resultType：输出结果参数-->
+    <select id="findUserById" parameterType="int" resultType="entity.User">
+        SELECT * from user WHERE id = #{id}
+    </select>
+
+    <!--根据用户名查询用户信息，可能返回多条-->
+    <!--${}表示sql的拼接，通过${}接收参数，将参数的内容不加任何修饰放在sql中-->
+    <select id="findUserByName" parameterType="java.lang.String" resultType="entity.User">
+        SELECT  * from user WHERE username like '%${value}%'
+    </select>
+
+    <insert id="insertUser" parameterType="entity.User">
+        INSERT INTO user VALUES (#{id},#{username},#{birthday},#{sex},#{address})
+    </insert>
+
+    <!--主键返回,order属性比那时该字段在insert语句之后才执行,还要借助函数-->
+    <insert id="insertUserByKey" parameterType="entity.User">
+        <selectKey keyProperty="id" order="AFTER" resultType="int">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO user VALUES (#{id},#{username},#{birthday},#{sex},#{address})
+    </insert>
+
+    <!--因为user表已经设置为自动增长，所以这个功能无法演示-->
+    <insert id="insertUserByUUID" parameterType="entity.User">
+        <selectKey keyProperty="id" order="BEFORE" resultType="String">
+            SELECT uuid()
+        </selectKey>
+        INSERT INTO user VALUES (#{id},#{username},#{birthday},#{sex},#{address})
+    </insert>
+</mapper>
